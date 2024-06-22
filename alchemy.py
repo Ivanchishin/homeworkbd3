@@ -28,9 +28,12 @@ def queryresult(publishername):
         .join(alchmodels.Stock.book) \
         .join(alchmodels.Stock.shop) \
         .join(alchmodels.Book.publisher) \
-        .join(alchmodels.Stock.sale) \
-        .filter(alchmodels.Publisher.name.like(f'{publishername}'))
-    for s in q.all():
+        .join(alchmodels.Stock.sale)
+    if publishername.isdigit():
+        result = q.filter(alchmodels.Publisher.id == publishername)
+    else:
+        result = q.filter(alchmodels.Publisher.name.like(f'{publishername}'))
+    for s in result.all():
         return print(f'{s.book.title} | {s.shop.name} |'
                      f' {s.sale.price} | {s.sale.date_sale}')
 
@@ -60,6 +63,6 @@ if __name__ == "__main__":
     session = configurate_session()
     data = load_file('tests_data.json')
     add_data(data)
-    publishername = input('Введите имя издателя\n')
+    publishername = input('Введите имя издателя или его id\n')
     queryresult(publishername)
     session.close()
